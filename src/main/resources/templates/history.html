@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>History</title>
+</head>
+<body>
+
+<h1>History</h1>
+
+<div th:each="number : ${numbers}">
+    <div th:if="${number.isCalculated()}">
+        <span th:text="${number.getNumber()}" th:attr="onclick='selectMinAndMax(\'' + ${number.getNumber()}+'\')'"></span>
+        <span th:id="is-calculated- + ${number.getNumber()}" th:text="${number.isCalculated()}" hidden></span>
+        <button th:attr="onclick='selectResult(\'' + ${number.getNumber()}+'\')'">Result</button>
+    </div>
+
+    <div th:unless="${number.isCalculated()}">
+        <span th:text="${number.getNumber()}"></span>
+        <span>Please, wait for calculation</span>
+    </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</body>
+
+<script>
+
+
+    function selectResult(number) {
+        window.location.replace("/select-result?number=" + number);
+    }
+
+    function selectMinAndMax(number) {
+        if (document.getElementById("is-calculated-" + number).value == 'false') {
+            return;
+        }
+
+        var min = selectMin(number);
+        var max = selectMax(number);
+
+        alert("Min: " + min + ". Max: " + max);
+    }
+
+    function selectMin(number) {
+        var min;
+        $.ajax({
+            url: "/select-min",
+            type: "GET",
+            data: {
+                number: number
+            },
+            success: function (xhr) {
+                min = xhr;
+            }
+        });
+
+        return min;
+    }
+
+    function selectMax(number) {
+        var max;
+        $.ajax({
+            url: "/select-max",
+            type: "GET",
+            data: {
+                number: number
+            },
+            success: function (xhr) {
+                max = xhr;
+            }
+        });
+
+        return max;
+    }
+</script>
+</html>

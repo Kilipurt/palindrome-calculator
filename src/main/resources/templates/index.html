@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Number enter</title>
+</head>
+<body>
+
+<form id="palindrome-form">
+    <label for="number">Number</label>
+    <input id="number" type="number"/>
+
+    <label for="number-of-palindromes">Number of palindromes</label>
+    <input id="number-of-palindromes" type="number"/>
+
+    <button type="submit">Find</button>
+</form>
+
+<button onclick="getHistory()">History</button>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</body>
+
+<script>
+    $("#palindrome-form").on("submit", function () {
+        saveNumber();
+        calculate();
+    });
+
+    function saveNumber() {
+        $.ajax({
+            url: "/save-number",
+            type: "POST",
+            data: {
+                number: document.getElementById("number").value
+            },
+            error: function (xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    }
+
+    function calculate() {
+        $.ajax({
+            url: "/calculate",
+            type: "POST",
+            data: {
+                number: document.getElementById("number").value,
+                amount: document.getElementById("number-of-palindromes").value
+            },
+            error: function (xhr) {
+                alert(xhr.responseText);
+            }
+        });
+
+        return false;
+    }
+
+    function getHistory() {
+        window.location.replace("/history");
+    }
+</script>
+
+</html>
