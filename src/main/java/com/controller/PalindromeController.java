@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @Controller
 public class PalindromeController {
 
@@ -25,13 +24,13 @@ public class PalindromeController {
 
     @GetMapping(path = "/history")
     public String history(Model model) throws Exception {
-        model.addAttribute("numbers", palindromeService.selectNumbers());
+        model.addAttribute("numbers", palindromeService.getNumbers());
         return "history";
     }
 
     @GetMapping(path = "/select-result")
-    public String selectResult(Model model, @RequestParam String number) throws Exception {
-        model.addAttribute("palindromes", palindromeService.selectPalindromes(number));
+    public String selectResult(Model model, @RequestParam String numberId) throws Exception {
+        model.addAttribute("palindromes", palindromeService.findById(Long.parseLong(numberId)).getPalindromes());
         return "result";
     }
 }

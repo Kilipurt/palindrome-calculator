@@ -1,28 +1,32 @@
 package com.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "NUMBERS")
+@Getter
+@Setter
 public class Number {
 
-    private String number;
-    private boolean isCalculated;
+    @Id
+    @GeneratedValue
+    @Column(name = "ID")
+    private long id;
 
-    public Number(String number, boolean isCalculated) {
-        this.number = number;
-        this.isCalculated = isCalculated;
-    }
+    @Column(name = "NUMBER_VALUE")
+    private String numberValue;
 
-    public String getNumber() {
-        return number;
-    }
+    @Column(name = "AMOUNT")
+    private long amount;
 
-    public boolean isCalculated() {
-        return isCalculated;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public void setCalculated(boolean calculated) {
-        isCalculated = calculated;
-    }
+    @ElementCollection
+    @CollectionTable(name = "PALINDROMES", joinColumns = @JoinColumn(name = "NUMBER_ID"))
+    @Column(name = "PALINDROME_VALUE")
+    private List<String> palindromes;
 }

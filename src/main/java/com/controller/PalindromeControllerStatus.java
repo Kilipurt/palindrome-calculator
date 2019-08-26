@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.model.Number;
 import com.service.PalindromeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,27 +20,23 @@ public class PalindromeControllerStatus {
         this.palindromeService = palindromeService;
     }
 
-    @PostMapping(path = "/save-number")
-    public ResponseEntity<String> saveNumber(@RequestParam String number) throws Exception {
-        palindromeService.saveNumber(number);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
-
     @PostMapping(path = "/calculate")
-    public ResponseEntity<String> calculatePalindromes(@RequestParam String number, @RequestParam String amount)
-            throws Exception {
-        palindromeService.calculatePalindromes(number, Integer.parseInt(amount));
+    public ResponseEntity<String> calculatePalindromes(@RequestParam(name = "number") String value,
+                                                       @RequestParam String amount) throws Exception {
+        Number number = new Number();
+        number.setNumberValue(value);
+        number.setAmount(Long.parseLong(amount));
+        palindromeService.calculatePalindromes(number);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(path = "/select-min")
-    public ResponseEntity<String> selectMin(@RequestParam String number) throws Exception {
-        System.out.println(palindromeService.selectMinPalindrome(number));
-        return new ResponseEntity<>(palindromeService.selectMinPalindrome(number), HttpStatus.OK);
+    public ResponseEntity<String> selectMin(@RequestParam String numberId) throws Exception {
+        return new ResponseEntity<>(palindromeService.selectMinPalindrome(Long.parseLong(numberId)), HttpStatus.OK);
     }
 
     @GetMapping(path = "/select-max")
-    public ResponseEntity<String> selectMax(@RequestParam String number) throws Exception {
-        return new ResponseEntity<>(palindromeService.selectMaxPalindrome(number), HttpStatus.OK);
+    public ResponseEntity<String> selectMax(@RequestParam String numberId) throws Exception {
+        return new ResponseEntity<>(palindromeService.selectMaxPalindrome(Long.parseLong(numberId)), HttpStatus.OK);
     }
 }

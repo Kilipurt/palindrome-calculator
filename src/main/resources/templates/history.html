@@ -3,77 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <title>History</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
 
 <h1>History</h1>
 
-<div th:each="number : ${numbers}">
-    <div th:if="${number.isCalculated()}">
-        <span th:text="${number.getNumber()}" th:attr="onclick='selectMinAndMax(\'' + ${number.getNumber()}+'\')'"></span>
-        <span th:id="is-calculated- + ${number.getNumber()}" th:text="${number.isCalculated()}" hidden></span>
-        <button th:attr="onclick='selectResult(\'' + ${number.getNumber()}+'\')'">Result</button>
+<div class="content" th:each="number : ${numbers}">
+    <div class="number-div"
+         th:if="${number.getPalindromes() != null && number.getPalindromes().size() == number.getAmount()}">
+        <span th:id="'number' + ${number.getId()}" th:onmouseover="'selectMinAndMax(\'' + ${number.getId()} + '\')'"
+              th:onmouseout="'hideMinAndMax(\'' + ${number.getId()} + '\')'" th:text="${number.getNumberValue()}">
+        </span>
+
+        <span class="min" th:id="'min' + ${number.getId()}"></span>
+        <span class="max" th:id="'max' + ${number.getId()}"></span>
+
+        <button th:onclick="'selectResult(\'' + ${number.getId()} + '\')'">Result</button>
+
+        <br>
     </div>
 
-    <div th:unless="${number.isCalculated()}">
-        <span th:text="${number.getNumber()}"></span>
+    <div th:unless="${number.getPalindromes() != null && number.getPalindromes().size() == number.getAmount()}">
+        <span th:text="${number.getNumberValue()}"></span>
         <span>Please, wait for calculation</span>
     </div>
-
 </div>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 </body>
 
+<style>
+    .min, .max {
+        display: none;
+    }
+
+    .content {
+        text-align: center;
+    }
+
+    .number-div {
+        text-align: left;
+        width: 100px;
+        margin: auto;
+    }
+</style>
+
 <script>
-
-
-    function selectResult(number) {
-        window.location.replace("/select-result?number=" + number);
+    function selectResult(id) {
+        window.location.replace("/select-result?numberId=" + id);
     }
 
-    function selectMinAndMax(number) {
-        if (document.getElementById("is-calculated-" + number).value == 'false') {
-            return;
-        }
+    function selectMinAndMax(id) {
+        selectMin(id);
+        selectMax(id);
 
-        var min = selectMin(number);
-        var max = selectMax(number);
-
-        alert("Min: " + min + ". Max: " + max);
+        document.getElementById("min" + id).style.display = 'block';
+        document.getElementById("max" + id).style.display = 'block';
     }
 
-    function selectMin(number) {
-        var min;
+    function hideMinAndMax(id) {
+        document.getElementById('min' + id).style.display = 'none';
+        document.getElementById('max' + id).style.display = 'none';
+    }
+
+    function selectMin(id) {
         $.ajax({
             url: "/select-min",
             type: "GET",
             data: {
-                number: number
+                numberId: id
             },
-            success: function (xhr) {
-                min = xhr;
+            success: function (data) {
+                document.getElementById("min" + id).innerText = "Min: " + data;
             }
         });
-
-        return min;
     }
 
-    function selectMax(number) {
-        var max;
+    function selectMax(id) {
         $.ajax({
             url: "/select-max",
             type: "GET",
             data: {
-                number: number
+                numberId: id
             },
-            success: function (xhr) {
-                max = xhr;
+            success: function (data) {
+                document.getElementById("max" + id).innerText = "Max: " + data;
             }
         });
-
-        return max;
     }
 </script>
 </html>

@@ -21,71 +21,70 @@ public class PalindromeService {
         this.palindromeDAO = palindromeDAO;
     }
 
-    public void saveNumber(String number) throws BadRequestException, InternalServerError {
-        validateNumber(number);
-        palindromeDAO.saveNumber(number);
-    }
-
-    public List<Number> selectNumbers() throws InternalServerError {
-        return palindromeDAO.selectNumbers();
-    }
-
-    public List<String> selectPalindromes(String number) throws InternalServerError {
-        return palindromeDAO.selectPalindromes(number);
-    }
-
-    public String selectMinPalindrome(String number) throws InternalServerError {
-        List<String> palindromes = palindromeDAO.selectPalindromes(number);
-
-        String minPalindrome = "";
-        for(String palindrome : palindromes) {
-            if (minPalindrome.compareTo(palindrome) > 0) {
-                minPalindrome = palindrome;
-            }
+    public Number findById(long id) throws BadRequestException, InternalServerError {
+        if (id <= 0) {
+            throw new BadRequestException("Wrong id");
         }
 
-        return minPalindrome;
+        return palindromeDAO.findById(id);
     }
 
-    public String selectMaxPalindrome(String number) throws InternalServerError {
-        List<String> palindromes = palindromeDAO.selectPalindromes(number);
+    public List<Number> getNumbers() throws InternalServerError {
+        return palindromeDAO.getNumbers();
+    }
 
-        String maxPalindrome = "";
-        for(String palindrome : palindromes) {
-            if (maxPalindrome.compareTo(palindrome) < 0) {
-                maxPalindrome = palindrome;
-            }
+    public String selectMinPalindrome(long id) throws InternalServerError, BadRequestException {
+        Number number = findById(id);
+
+        if (number.getPalindromes() == null || number.getPalindromes().isEmpty()) {
+            throw new BadRequestException("Please, wait for calculation");
         }
 
-        return maxPalindrome;
+        return Collections.min(number.getPalindromes(), new StringComparator());
     }
 
-    public void calculatePalindromes(String inputNumber, int amount) throws Exception {
-        String startInputNumber = inputNumber;
+    public String selectMaxPalindrome(long id) throws InternalServerError, BadRequestException {
+        Number number = findById(id);
 
-        if (amount <= 0) {
+        if (number.getPalindromes() == null || number.getPalindromes().isEmpty()) {
+            throw new BadRequestException("Please, wait for calculation");
+        }
+
+        return Collections.max(number.getPalindromes(), new StringComparator());
+    }
+
+    public void calculatePalindromes(Number inputNumber) throws Exception {
+        inputNumber.setId(saveNumber(inputNumber));
+
+        String startInputNumber = inputNumber.getNumberValue();
+
+        if (inputNumber.getAmount() <= 0) {
             throw new BadRequestException("Wrong enter amount");
         }
 
-        validateNumber(inputNumber);
+        validateNumber(startInputNumber);
 
         List<String> palindromes = new ArrayList<>();
 
-        if (isPalindrome(inputNumber)) {
-            palindromes.add(inputNumber);
+        if (isPalindrome(startInputNumber)) {
+            palindromes.add(startInputNumber);
 
-            inputNumber = increaseByOne(inputNumber);
+            startInputNumber = increaseByOne(startInputNumber);
         }
 
-        while (palindromes.size() != amount) {
-            String palindrome = calculateNextPalindrome(new StringBuilder(inputNumber));
+        while (palindromes.size() != inputNumber.getAmount()) {
+            String palindrome = calculateNextPalindrome(new StringBuilder(startInputNumber));
             palindromes.add(palindrome);
-            inputNumber = increaseByOne(palindrome);
+            startInputNumber = increaseByOne(palindrome);
         }
 
-        System.out.println(startInputNumber);
+        inputNumber.setPalindromes(palindromes);
+        palindromeDAO.updateNumber(inputNumber);
+    }
 
-        palindromeDAO.savePalindromes(startInputNumber, palindromes);
+    private long saveNumber(Number number) throws BadRequestException, InternalServerError {
+        validateNumber(number.getNumberValue());
+        return palindromeDAO.saveNumber(number);
     }
 
     private String calculateNextPalindrome(StringBuilder number) {

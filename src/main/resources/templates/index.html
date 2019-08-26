@@ -6,44 +6,51 @@
 </head>
 <body>
 
-<form id="palindrome-form">
-    <label for="number">Number</label>
-    <input id="number" type="number"/>
+<div class="content">
+    <form id="palindrome-form">
+        <table>
+            <tr>
+                <td><label for="number">Number: </label></td>
+                <td><input id="number" type="number"/></td>
+            </tr>
+            <tr>
+                <td><label for="number-of-palindromes">Number of palindromes: </label></td>
+                <td><input id="number-of-palindromes" type="number"/></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button type="submit">Find</button>
+                </td>
+            </tr>
+        </table>
+    </form>
 
-    <label for="number-of-palindromes">Number of palindromes</label>
-    <input id="number-of-palindromes" type="number"/>
+    <br>
 
-    <button type="submit">Find</button>
-</form>
-
-<button onclick="getHistory()">History</button>
+    <button onclick="getHistory()">History</button>
+</div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
 </body>
 
-<script>
-    $("#palindrome-form").on("submit", function () {
-        saveNumber();
-        calculate();
-    });
-
-    function saveNumber() {
-        $.ajax({
-            url: "/save-number",
-            type: "POST",
-            data: {
-                number: document.getElementById("number").value
-            },
-            error: function (xhr) {
-                alert(xhr.responseText);
-            }
-        });
-
-        return false;
+<style>
+    .content, #palindrome-form {
+        text-align: center;
     }
 
-    function calculate() {
+    .content {
+        position: center;
+    }
+
+    table {
+        width: 300px;
+        margin: auto;
+    }
+</style>
+
+<script>
+    $("#palindrome-form").on("submit", function () {
         $.ajax({
             url: "/calculate",
             type: "POST",
@@ -57,10 +64,10 @@
         });
 
         return false;
-    }
+    });
 
     function getHistory() {
-        window.location.replace("/history");
+        window.location.href = "/history";
     }
 </script>
 
